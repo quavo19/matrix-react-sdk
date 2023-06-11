@@ -50,6 +50,8 @@ import { UserOnboardingButton } from "../views/user-onboarding/UserOnboardingBut
 
 interface IProps {
     isMinimized: boolean;
+    isOpen: boolean;
+    toggleMenu: () => void;
     pageType: PageType;
     resizeNotifier: ResizeNotifier;
 }
@@ -204,7 +206,7 @@ export default class LeftPanel extends React.Component<IProps, IState> {
 
             if (style.makeInvisible) {
                 // we will have already removed the 'display: none', so add it back.
-                header.style.display = "none";
+                header.style.display = "block";
                 continue; // nothing else to do, even if sticky somehow
             }
 
@@ -372,8 +374,11 @@ export default class LeftPanel extends React.Component<IProps, IState> {
     }
 
     public render(): React.ReactNode {
+        const { isOpen, toggleMenu } = this.props;
         const roomList = (
             <RoomList
+                isOpen={isOpen}
+                toggleMenu={toggleMenu}
                 onKeyDown={this.onKeyDown}
                 resizeNotifier={this.props.resizeNotifier}
                 onFocus={this.onFocus}
@@ -385,7 +390,7 @@ export default class LeftPanel extends React.Component<IProps, IState> {
                 ref={this.roomListRef}
             />
         );
-
+        
         const containerClasses = classNames({
             mx_LeftPanel: true,
             mx_LeftPanel_minimized: this.props.isMinimized,

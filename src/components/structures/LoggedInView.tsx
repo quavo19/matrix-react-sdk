@@ -124,7 +124,15 @@ interface IState {
  *
  * Components mounted below us can access the matrix client via the react context.
  */
+interface IState {
+    isOpen: boolean;
+    useCompactLayout: boolean;
+    usageLimitDismissed: boolean;
+    activeCalls: MatrixCall[]; // Replace with the correct type
+  }
 class LoggedInView extends React.Component<IProps, IState> {
+    
+   
     public static displayName = "LoggedInView";
 
     protected readonly _matrixClient: MatrixClient;
@@ -138,14 +146,17 @@ class LoggedInView extends React.Component<IProps, IState> {
 
     public constructor(props: IProps) {
         super(props);
-
         this.state = {
+            isOpen: false,
             syncErrorData: undefined,
             // use compact timeline view
             useCompactLayout: SettingsStore.getValue("useCompactLayout"),
             usageLimitDismissed: false,
             activeCalls: LegacyCallHandler.instance.getAllActiveCalls(),
         };
+        
+        
+        
 
         // stash the MatrixClient in case we log out before we are unmounted
         this._matrixClient = this.props.matrixClient;
@@ -158,6 +169,13 @@ class LoggedInView extends React.Component<IProps, IState> {
         this._resizeContainer = React.createRef();
         this.resizeHandler = React.createRef();
     }
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    public toggleMenu = () => {
+        this.setState(prevState => ({
+          isOpen: !prevState.isOpen
+          
+        }));
+      }
 
     public componentDidMount(): void {
         document.addEventListener("keydown", this.onNativeKeyDown, false);
@@ -239,8 +257,8 @@ class LoggedInView extends React.Component<IProps, IState> {
             onCollapsed: (collapsed) => {
                 panelCollapsed = collapsed;
                 if (collapsed) {
-                    dis.dispatch({ action: "hide_left_panel" });
-                    window.localStorage.setItem("mx_lhs_size", "0");
+                    dis.dispatch({ action: "hide_left_panel2" });
+                    window.localStorage.setItem("mx_lhs_size2", "0");
                 } else {
                     dis.dispatch({ action: "show_left_panel" });
                 }
@@ -666,9 +684,15 @@ class LoggedInView extends React.Component<IProps, IState> {
         const audioFeedArraysForCalls = this.state.activeCalls.map((call) => {
             return <AudioFeedArrayForLegacyCall call={call} key={call.callId} />;
         });
-
+        const { isOpen } = this.state;
+        
         return (
             <MatrixClientContext.Provider value={this._matrixClient}>
+                <button className={`hamburger-leftpannel ${isOpen ? 'ham-menu opened' : 'ham-menu'}`} onClick={() => this.toggleMenu()}>
+                <span className="line line1" />
+                <span className="line line2" />
+                <span className="line line3" />
+                </button>
                 <div
                     onPaste={this.onPaste}
                     onKeyDown={this.onReactKeyDown}
@@ -677,25 +701,32 @@ class LoggedInView extends React.Component<IProps, IState> {
                 >
                     <ToastContainer />
                     <div className={bodyClasses}>
-                        <div className="mx_LeftPanel_outerWrapper">
-                            <LeftPanelLiveShareWarning isMinimized={this.props.collapseLhs || false} />
-                            <nav className="mx_LeftPanel_wrapper">
-                                <BackdropPanel blurMultiplier={0.5} backgroundImage={this.state.backgroundImage} />
-                                <SpacePanel />
-                                <BackdropPanel backgroundImage={this.state.backgroundImage} />
-                                <div
-                                    className="mx_LeftPanel_wrapper--user"
-                                    ref={this._resizeContainer}
-                                    data-collapsed={this.props.collapseLhs ? true : undefined}
-                                >
-                                    <LeftPanel
-                                        pageType={this.props.page_type as PageTypes}
-                                        isMinimized={this.props.collapseLhs || false}
-                                        resizeNotifier={this.props.resizeNotifier}
-                                    />
-                                </div>
-                            </nav>
-                        </div>
+                    
+                       
+                            <div className={`${isOpen ? 'nav-opened' : ''} mx_LeftPanel_outerWrapper`}>
+                                <LeftPanelLiveShareWarning />
+                                <nav className="mx_LeftPanel_wrapper">
+                                    <BackdropPanel blurMultiplier={0.5} backgroundImage={this.state.backgroundImage} />
+                                    
+                                    <SpacePanel />
+                                    <BackdropPanel backgroundImage={this.state.backgroundImage} />
+                                    <div
+                                        className="mx_LeftPanel_wrapper--user"
+                                        ref={this._resizeContainer}
+                                        data-collapsed={this.props.collapseLhs ? true : undefined}
+                                    >
+                                        <LeftPanel
+                                            isOpen={isOpen}
+                                            toggleMenu={this.toggleMenu}
+                                            pageType={this.props.page_type as PageTypes}
+                                            isMinimized={this.props.collapseLhs || false}
+                                            resizeNotifier={this.props.resizeNotifier}
+                                        />
+                                    </div>
+                                </nav>
+                            </div>
+                      
+                        
                         <ResizeHandle passRef={this.resizeHandler} id="lp-resizer" />
                         <div className="mx_RoomView_wrapper">{pageElement}</div>
                     </div>

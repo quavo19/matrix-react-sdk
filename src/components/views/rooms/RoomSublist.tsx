@@ -71,6 +71,8 @@ export interface IAuxButtonProps {
 }
 
 interface IProps {
+    isOpen: boolean;
+    toggleMenu: () => void;
     forRooms: boolean;
     startAsHidden: boolean;
     label: string;
@@ -522,6 +524,7 @@ export default class RoomSublist extends React.Component<IProps, IState> {
         }
 
         const tiles: React.ReactElement[] = [];
+        const { toggleMenu } = this.props;
 
         if (this.state.rooms) {
             let visibleRooms = this.state.rooms;
@@ -532,6 +535,7 @@ export default class RoomSublist extends React.Component<IProps, IState> {
             for (const room of visibleRooms) {
                 tiles.push(
                     <RoomTile
+                        toggleMenu={toggleMenu}
                         room={room}
                         key={`room-${room.roomId}`}
                         showMessagePreview={this.layout.showPreviews}
@@ -854,6 +858,8 @@ export default class RoomSublist extends React.Component<IProps, IState> {
                 mx_RoomSublist_resizerHandles: true,
                 mx_RoomSublist_resizerHandles_showNButton: !!showNButton,
             });
+            
+            
 
             content = (
                 <React.Fragment>
@@ -869,6 +875,7 @@ export default class RoomSublist extends React.Component<IProps, IState> {
                         className="mx_RoomSublist_resizeBox"
                         enable={handles}
                     >
+                        
                         <div className="mx_RoomSublist_tiles" ref={this.tilesRef}>
                             {visibleTiles}
                         </div>

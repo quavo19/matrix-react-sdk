@@ -51,6 +51,7 @@ import { SdkContextClass } from "../../../contexts/SDKContext";
 import { useHasRoomLiveVoiceBroadcast, VoiceBroadcastRoomSubtitle } from "../../../voice-broadcast";
 
 interface Props {
+    toggleMenu: () => void;
     room: Room;
     showMessagePreview: boolean;
     isMinimized: boolean;
@@ -411,10 +412,13 @@ export class RoomTile extends React.PureComponent<ClassProps, State> {
             mx_RoomTile_titleWithSubtitle: !!subtitle,
             mx_RoomTile_titleHasUnreadEvents: this.notificationState.isUnread,
         });
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+        const { toggleMenu } = this.props;
 
         const titleContainer = this.props.isMinimized ? null : (
+            
             <div className="mx_RoomTile_titleContainer">
-                <div title={name} className={titleClasses} tabIndex={-1}>
+                <div onClick={toggleMenu} title={name} className={titleClasses} tabIndex={-1}>
                     <span dir="auto">{name}</span>
                 </div>
                 {subtitle}

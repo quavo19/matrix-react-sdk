@@ -64,6 +64,8 @@ import RoomSublist, { IAuxButtonProps } from "./RoomSublist";
 import { SdkContextClass } from "../../../contexts/SDKContext";
 
 interface IProps {
+    isOpen: boolean;
+    toggleMenu: () => void;
     onKeyDown: (ev: React.KeyboardEvent, state: IRovingTabIndexState) => void;
     onFocus: (ev: React.FocusEvent) => void;
     onBlur: (ev: React.FocusEvent) => void;
@@ -667,10 +669,13 @@ export default class RoomList extends React.PureComponent<IProps, IState> {
             ) {
                 forceExpanded = true;
             }
+            const { isOpen, toggleMenu } = this.props;
             // The cost of mounting/unmounting this component offsets the cost
             // of keeping it in the DOM and hiding it when it is not required
             return (
                 <RoomSublist
+                    isOpen={isOpen}
+                    toggleMenu={toggleMenu}
                     key={`sublist-${orderedTagId}`}
                     tagId={orderedTagId}
                     forRooms={true}
